@@ -123,9 +123,7 @@ const node = new IPFS({
       Swarm: [
         '/ip4/0.0.0.0/tcp/9101',
         '/ip4/0.0.0.0/tcp/4004/ws',
-        //'/ip4/129.211.127.83/tcp/443/wss/p2p-webrtc-star',
-       // '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
-        //'/ip4/129.211.127.83/tcp/443/wss/p2p-websocket-star'
+        '/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star'
       ]
     },
     Bootstrap: [
@@ -136,34 +134,10 @@ const node = new IPFS({
 
 console.log('auto starting my node...')
 
-const setBootstrap = async () => {
-  console.log('setting bootstrap node...')
-  // query bootsrap nodes
-  await node.bootstrap.list(function (err, res) {
-    console.log('query bootsrap node list :', res.Peers)
-  })
-  await node.bootstrap.rm(null, { all: true }, function (err, res) {
-    if (err) {
-      console.log(err)
-    }
-    console.log(res)
-  })
-  await node.bootstrap.add(mNodeAddr, false, function (err, res) {
-    if (err) {
-      console.log(err)
-    }
-    console.log(res)
-  })
-
-}
-
 // Listen for the node to start, so we can log out some metrics
 node.once('start', (err) => {
   assert.ifError(err, 'Should startup without issue')
 
-  //set bootstrap nodes
-  setBootstrap()
-  // node.swarm.connect(mNodeAddr)
   // Lets log out the number of peers we have every 2 seconds
   setInterval(() => {
     node.swarm.peers((err, peers) => {
@@ -177,7 +151,7 @@ node.once('start', (err) => {
         console.log(element.addr, element.peer._idB58String);
       });
     })
-  }, 1000)
+  }, 5000)
 
   // Log out the bandwidth stats every 4 seconds so we can see how our configuration is doing
   setInterval(() => {
@@ -187,5 +161,5 @@ node.once('start', (err) => {
       }
       console.log(`\nBandwidth Stats: ${JSON.stringify(stats, null, 2)}\n`)
     })
-  }, 4000)
+  }, 10000)
 })
