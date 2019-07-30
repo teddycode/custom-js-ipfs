@@ -16,7 +16,7 @@
     "Swarm": [
       "/ip4/0.0.0.0/tcp/9101",
       "/ip4/0.0.0.0/tcp/4004/ws",
-      "/ip4/129.211.127.83/tcp/9090/ws/p2p-webrtc-star/"
+      "/ip4/129.211.127.83/tcp/80/ws/p2p-webrtc-star/"
     ],
     "API": "/ip4/127.0.0.1/tcp/5002",
     "Gateway": "/ip4/127.0.0.1/tcp/9090",

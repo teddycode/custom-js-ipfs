@@ -12,7 +12,6 @@ const SPDY = require('libp2p-spdy')
 const KadDHT = require('libp2p-kad-dht')
 const MPLEX = require('pull-mplex')
 const SECIO = require('libp2p-secio')
-const assert = require('assert')
 const Protector = require('libp2p-pnet')
 
 const fs = require('fs')
@@ -98,7 +97,7 @@ const libp2pBundle = (opts) => {
         enabled: true,
         kBucketSize: 20,
         randomWalk: {
-          enabled: true,
+          enabled: false,
           interval: 10e3, // This is set low intentionally, so more peers are discovered quickly. Higher intervals are recommended
           timeout: 2e3 // End the query quickly since we're running so frequently
         }
@@ -123,7 +122,7 @@ const readyToBoost = async () => {
         Swarm: [
           '/ip4/0.0.0.0/tcp/9101',
           '/ip4/0.0.0.0/tcp/4004/ws',
-          '/ip4/129.211.127.83/tcp/9090/ws/p2p-webrtc-star/'
+          '/ip4/129.211.127.83/tcp/80/ws/p2p-webrtc-star/'
         ]
       },
       Bootstrap: [
