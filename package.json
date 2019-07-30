@@ -19,8 +19,10 @@
     "libp2p-secio": "~0.11.1",
     "libp2p-spdy": "~0.13.3",
     "libp2p-tcp": "~0.13.0",
-    "libp2p-websocket-star": "~0.10.2",
     "libp2p-webrtc-star": "~0.16.0",
-    "pull-mplex": "~0.1.0"
+    "libp2p-websocket-star": "~0.10.2",
+    "node-pre-gyp": "^0.13.0",
+    "pull-mplex": "~0.1.0",
+    "wrtc": "^0.4.1"
   }
 }

@@ -2,6 +2,7 @@
 
 const Libp2p = require('libp2p')
 const IPFS = require('ipfs')
+const wrtc = require('wrtc')
 const TCP = require('libp2p-tcp')
 const MulticastDNS = require('libp2p-mdns')
 const WebSocketStar = require('libp2p-websocket-star')
@@ -30,7 +31,7 @@ const libp2pBundle = (opts) => {
 
   // Create our WebSocketStar transport and give it our PeerId, straight from the ipfs node
   const wsstar = new WebSocketStar({ id: peerInfo.id })
-  const wrtcstar = new WebRTCStar({ id: peerInfo.id })
+  const wrtcstar = new WebRTCStar({ wrtc })
 
   // Build and return our libp2p node
   return new Libp2p({
@@ -109,57 +110,69 @@ const libp2pBundle = (opts) => {
   })
 }
 
-// Read the swarmKey on repo  path
-
-const mNodeAddr = '/ip4/129.211.127.83/tcp/4001/ipfs/QmXt4bwenzr8apvhE1Lkn2HjKcdT5EZppk5P1TK9rr8B9v'
+var node = ''
 // Now that we have our custom libp2p bundle, let's start up the ipfs node!
-const node = new IPFS({
-  libp2p: libp2pBundle,
-  repo: repoPath,
-  // libp2p: privateLibp2pBundle(swarmKeyPath),
-  config: {
-    Addresses: {
-      // Set the swarm address so we dont get port collision on the nodes
-      Swarm: [
-        '/ip4/0.0.0.0/tcp/9101',
-        '/ip4/0.0.0.0/tcp/4004/ws',
-        '/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star'
+const readyToBoost = async () => {
+  node = new IPFS({
+    libp2p: libp2pBundle,
+    repo: repoPath,
+    // libp2p: privateLibp2pBundle(swarmKeyPath),
+    config: {
+      Addresses: {
+        // Set the swarm address so we dont get port collision on the nodes
+        Swarm: [
+          '/ip4/0.0.0.0/tcp/9101',
+          '/ip4/0.0.0.0/tcp/4004/ws',
+          '/ip4/129.211.127.83/tcp/9090/ws/p2p-webrtc-star/'
+        ]
+      },
+      Bootstrap: [
+        '/ip4/129.211.127.83/tcp/4001/ipfs/QmXt4bwenzr8apvhE1Lkn2HjKcdT5EZppk5P1TK9rr8B9v'
       ]
-    },
-    Bootstrap: [
-      '/ip4/129.211.127.83/tcp/4001/ipfs/QmXt4bwenzr8apvhE1Lkn2HjKcdT5EZppk5P1TK9rr8B9v'
-    ]
-  }
-})
+    }
+  })
+  await node.ready
+}
 
-console.log('auto starting my node...')
+readyToBoost()
 
-// Listen for the node to start, so we can log out some metrics
-node.once('start', (err) => {
-  assert.ifError(err, 'Should startup without issue')
+console.log('my node started!')
 
-  // Lets log out the number of peers we have every 2 seconds
-  setInterval(() => {
+//we can log out some metrics
+var pcnt = 0; var mcnt = 0;
+const logNodeMsg = () => {
+  // Lets log out the number of peers we have every n seconds
+  const interval1 = setInterval(() => {
     node.swarm.peers((err, peers) => {
       if (err) {
         console.log('An error occurred trying to check our peers:', err)
         process.exit(1)
       }
       console.log(`The node now has ${peers.length} peers.`)
-      console.log('Those peers are: ')
       peers.forEach(element => {
-        console.log(element.addr, element.peer._idB58String);
+        console.log(element.peer._idB58String)
       });
     })
+    if (++pcnt > 20) {
+      clearInterval(interval1)
+      console.log('peers logout stoped, my node is still running!')
+    }
   }, 5000)
 
   // Log out the bandwidth stats every 4 seconds so we can see how our configuration is doing
-  setInterval(() => {
+  const interval2 = setInterval(() => {
     node.stats.bw((err, stats) => {
       if (err) {
         console.log('An error occurred trying to check our stats:', err)
       }
       console.log(`\nBandwidth Stats: ${JSON.stringify(stats, null, 2)}\n`)
     })
+    if (++mcnt > 10) {
+      clearInterval(interval2)
+      console.log('bandwidth logout stoped, node is still running')
+    }
   }, 10000)
-})
+}
+
+
+logNodeMsg()
