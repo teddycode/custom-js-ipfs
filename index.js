@@ -101,9 +101,6 @@ const libp2pBundle = (opts) => {
           interval: 10e3, // This is set low intentionally, so more peers are discovered quickly. Higher intervals are recommended
           timeout: 2e3 // End the query quickly since we're running so frequently
         }
-      },
-      EXPERIMENTAL: {
-        pubsub: true
       }
     }
   })
@@ -115,18 +112,16 @@ const readyToBoost = async () => {
   node = new IPFS({
     libp2p: libp2pBundle,
     repo: repoPath,
-    // libp2p: privateLibp2pBundle(swarmKeyPath),
     config: {
       Addresses: {
         // Set the swarm address so we dont get port collision on the nodes
         Swarm: [
           '/ip4/0.0.0.0/tcp/9101',
-          '/ip4/0.0.0.0/tcp/4004/ws',
-          '/ip4/129.211.127.83/tcp/80/ws/p2p-webrtc-star/'
+          '/dns4/guetdcl.cn/tcp/4433/wss/p2p-websocket-star/'
         ]
       },
       Bootstrap: [
-        '/ip4/129.211.127.83/tcp/4001/ipfs/QmXt4bwenzr8apvhE1Lkn2HjKcdT5EZppk5P1TK9rr8B9v'
+        '/dns4/guetdcl.cn/tcp/8082/wss/ipfs/QmXt4bwenzr8apvhE1Lkn2HjKcdT5EZppk5P1TK9rr8B9v'
       ]
     }
   })
@@ -152,9 +147,10 @@ const logNodeMsg = () => {
         console.log(element.peer._idB58String)
       });
     })
-    if (++pcnt > 20) {
+    if (++pcnt > 2000) {
       clearInterval(interval1)
       console.log('peers logout stoped, my node is still running!')
+      getFile(hash)
     }
   }, 5000)
 
@@ -166,7 +162,7 @@ const logNodeMsg = () => {
       }
       console.log(`\nBandwidth Stats: ${JSON.stringify(stats, null, 2)}\n`)
     })
-    if (++mcnt > 10) {
+    if (++mcnt > 5) {
       clearInterval(interval2)
       console.log('bandwidth logout stoped, node is still running')
     }
@@ -175,3 +171,29 @@ const logNodeMsg = () => {
 
 
 logNodeMsg()
+
+var filesPath = path.resolve('./getFiles')
+var hash = 'QmVDTuLs8a4PZsHZgYKMKDTJRnnyYU7WdB8Vbi9tfFrL6o'
+const getFile = (hash) => {
+  node.get(hash)
+    .then((files) => {
+      files.forEach((file) => {
+        if (file.content) {
+          console.log('Getting file:', file.name)
+          let filePath = path.resolve(filesPath, file.name)
+          fs.open(filePath, 'w', function (err, fd) {
+            if (err) {
+              console.log('ERR:', err, file.name, ' can not be save!');
+            }
+            fs.writeFile(fd, file.content, function (err) {
+              console.log('File write error: ', err)
+            })
+          })
+        }
+      })
+    })
+}
+
+
+
+
