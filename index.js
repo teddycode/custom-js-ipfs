@@ -13,6 +13,7 @@ const KadDHT = require('libp2p-kad-dht')
 const MPLEX = require('pull-mplex')
 const SECIO = require('libp2p-secio')
 const Protector = require('libp2p-pnet')
+const GossipSub = require('libp2p-gossipsub')
 
 const fs = require('fs')
 const path = require('path')
@@ -63,6 +64,7 @@ const libp2pBundle = (opts) => {
         wrtcstar.discovery
       ],
       dht: KadDHT,
+      pubsub: GossipSub,
       //set private connector
       connProtector: new Protector(fs.readFileSync(swarmKeyPath))
     },
@@ -101,6 +103,12 @@ const libp2pBundle = (opts) => {
           interval: 10e3, // This is set low intentionally, so more peers are discovered quickly. Higher intervals are recommended
           timeout: 2e3 // End the query quickly since we're running so frequently
         }
+      },
+      pubsub: {
+        enabled: true,
+        emitSelf: true,      // whether the node should emit to self on publish, in the event of the topic being subscribed
+        signMessages: true,  // if messages should be signed
+        strictSigning: true  // if message signing should be required
       }
     }
   })

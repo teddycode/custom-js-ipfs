@@ -15,8 +15,7 @@
   "Addresses": {
     "Swarm": [
       "/ip4/0.0.0.0/tcp/9101",
-      "/ip4/0.0.0.0/tcp/4004/ws",
-      "/ip4/129.211.127.83/tcp/80/ws/p2p-webrtc-star/"
+      "/dns4/guetdcl.cn/tcp/4433/wss/p2p-websocket-star/"
     ],
     "API": "/ip4/127.0.0.1/tcp/5002",
     "Gateway": "/ip4/127.0.0.1/tcp/9090",
@@ -32,7 +31,7 @@
     }
   },
   "Bootstrap": [
-    "/ip4/129.211.127.83/tcp/4001/ipfs/QmXt4bwenzr8apvhE1Lkn2HjKcdT5EZppk5P1TK9rr8B9v"
+    "/dns4/guetdcl.cn/tcp/8082/wss/ipfs/QmXt4bwenzr8apvhE1Lkn2HjKcdT5EZppk5P1TK9rr8B9v"
   ],
   "Swarm": {
     "ConnMgr": {
